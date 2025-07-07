@@ -94,11 +94,3 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
-
-.is-invalid {
-  border-color: #dc3545 !important;
-}
-.invalid-feedback {
-  color: #dc3545;
-  font-size: 0.875em;
-}

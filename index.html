@@ -9,20 +9,12 @@
   <body>
 <div class="container mt-5">
   <h1>RSS Reader</h1>
-<form id="rss-form">
+<form id="rss-form" class="mt-4">
   <div class="mb-3">
-    <input
-      type="text"
-      id="rss-url"
-      class="form-control"
-      name="url"
-      required
-      placeholder="https://example.com/rss"
-    >
-    <div class="invalid-feedback">
-    </div>
+    <input type="text" class="form-control" id="rss-url" required placeholder="https://example.com/rss">
+    <div class="invalid-feedback"></div>
   </div>
-  <button type="submit" class="btn btn-primary">Добавить</button>
+  <button type="submit" class="btn btn-primary">Add RSS</button>
 </form>
   <div id="rss-feed" class="mt-4"></div>
 </div>

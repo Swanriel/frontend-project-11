@@ -1,8 +1,9 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap';
-import * as yup from 'yup';
-import onChange from 'on-change';
-import './style.css';
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap'
+import * as yup from 'yup'
+import onChange from 'on-change'
+import './style.css'
+import './main.css'
 
 const rssSchema = yup.object().shape({
   url: yup

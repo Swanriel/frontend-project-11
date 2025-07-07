@@ -2,6 +2,14 @@ import './style.css'
 import javascriptLogo from './javascript.svg'
 import viteLogo from '/vite.svg'
 import { setupCounter } from './counter.js'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap'
+
+document.getElementById('rss-form').addEventListener('submit', (e) => {
+  e.preventDefault()
+  const url = document.getElementById('rss-url').value
+  console.log('RSS URL:', url) 
+})
 
 document.querySelector('#app').innerHTML = `
   <div>

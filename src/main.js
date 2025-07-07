@@ -1,32 +1,75 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
+import * as yup from 'yup';
+import onChange from 'on-change';
+import './style.css';
 
-document.getElementById('rss-form').addEventListener('submit', (e) => {
-  e.preventDefault()
-  const url = document.getElementById('rss-url').value
-  console.log('RSS URL:', url) 
-})
+const rssSchema = yup.object().shape({
+  url: yup
+    .string()
+    .required('URL is required')
+    .url('Incorrect URL')
+    .test(
+      'is-unique',
+      'RSS already existed',
+      (value, { parent: { feeds } }) => !feeds.includes(value)
+    ),
+});
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+const state = {
+  form: {
+    process: 'filling', // 'filling' | 'sending' | 'success' | 'error'
+    error: null,
+  },
+  feeds: [],
+};
 
-setupCounter(document.querySelector('#counter'))
+const initView = (state, formEl, inputEl) => {
+  const watchedState = onChange(state, (path) => {
+    if (path === 'form.error') {
+      inputEl.classList.toggle('is-invalid', !!state.form.error);
+      const feedbackEl = inputEl.nextElementSibling;
+      if (feedbackEl && feedbackEl.classList.contains('invalid-feedback')) {
+        feedbackEl.textContent = state.form.error || '';
+      }
+    }
+    if (path === 'form.process' && state.form.process === 'success') {
+      formEl.reset();
+      inputEl.focus();
+    }
+  });
+
+  return watchedState;
+};
+
+const app = () => {
+  const formEl = document.getElementById('rss-form');
+  const inputEl = document.getElementById('rss-url');
+  const watchedState = initView(state, formEl, inputEl);
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const url = formData.get('url').trim();
+
+    rssSchema
+      .validate({ url, feeds: watchedState.feeds }, { abortEarly: false })
+      .then(() => {
+        watchedState.form.process = 'sending';
+        watchedState.form.error = null;
+        return new Promise((resolve) => {
+          setTimeout(() => resolve(), 1000);
+        });
+      })
+      .then(() => {
+        watchedState.feeds.push(url);
+        watchedState.form.process = 'success';
+      })
+      .catch((err) => {
+        watchedState.form.error = err.message;
+        watchedState.form.process = 'error';
+      });
+  });
+};
+
+app();

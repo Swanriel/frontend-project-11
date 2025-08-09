@@ -1,0 +1,33 @@
+{
+  "name": "frontend-project-11",
+  "version": "1.0.0",
+  "description": "[![Actions Status](https://github.com/Swanriel/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Swanriel/frontend-project-11/actions)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Swanriel/frontend-project-11.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Swanriel/frontend-project-11/issues"
+  },
+  "homepage": "https://github.com/Swanriel/frontend-project-11#readme",
+  "devDependencies": {
+    "bootstrap": "^5.3.7",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
+    "vite": "^7.1.1"
+  }
+}

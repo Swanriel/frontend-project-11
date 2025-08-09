@@ -1,78 +1,64 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as yup from "yup";
 import onChange from "on-change";
+import View from "./view.js";
+import { rssSchema } from "./validation.js";
 
-// Схема валидации
-const createSchema = (feeds) =>
-  yup.object({
-    url: yup
-      .string()
-      .required("URL is required")
-      .url("Must be a valid URL")
-      .notOneOf(feeds, "This RSS feed already exists"),
-  });
-
-// Состояние приложения
-const state = onChange(
-  {
-    feeds: [],
-    form: {
-      state: "filling",
-      error: null,
-      valid: true,
-      value: "",
+// Инициализация состояния
+const state = onChange({
+  feeds: [],
+  form: {
+    state: "filling", // filling, sending, success, error
+    error: null,
+    fields: {
+      url: "",
     },
+    valid: true,
   },
-  (path) => {
-    if (path === "form.error" || path === "form.valid") {
-      updateUI();
-    }
-  },
-);
+});
 
-// Элементы DOM
-const form = document.getElementById("rss-form");
-const input = document.getElementById("url-input");
-const feedback = document.querySelector(".invalid-feedback");
+// Инициализация View
+const formElement = document.getElementById("rss-form");
+const inputElement = document.getElementById("url-input");
+const feedbackElement = document.querySelector(".invalid-feedback");
+const view = new View(formElement, inputElement, feedbackElement);
 
 // Обработчики событий
-form.addEventListener("submit", (e) => {
+formElement.addEventListener("submit", async (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const url = formData.get("url").trim();
 
-  validateUrl(url)
-    .then(() => {
-      state.feeds.push(url);
-      state.form.state = "success";
-      state.form.error = null;
-      state.form.valid = true;
-      form.reset();
-      input.focus();
-    })
-    .catch((err) => {
-      state.form.state = "error";
-      state.form.error = err.message;
-      state.form.valid = false;
-    });
-});
+  state.form.state = "sending";
+  view.render(state.form);
 
-input.addEventListener("input", (e) => {
-  state.form.value = e.target.value;
-});
-
-// Функция валидации
-function validateUrl(url) {
-  return createSchema(state.feeds).validate({ url }, { abortEarly: false });
-}
-
-// Обновление UI
-function updateUI() {
-  if (!state.form.valid) {
-    input.classList.add("is-invalid");
-    feedback.textContent = state.form.error;
-  } else {
-    input.classList.remove("is-invalid");
-    feedback.textContent = "";
+  try {
+    await rssSchema(state.feeds).validate({ url });
+    state.feeds.push(url);
+    state.form.state = "success";
+    state.form.error = null;
+    state.form.valid = true;
+    state.form.fields.url = "";
+    view.render(state.form);
+    view.resetForm();
+  } catch (err) {
+    state.form.state = "error";
+    state.form.error = err.message;
+    state.form.valid = false;
+    view.render(state.form);
   }
-}
+});
+
+inputElement.addEventListener("input", (e) => {
+  state.form.fields.url = e.target.value;
+  state.form.valid = true;
+  state.form.error = null;
+  view.render(state.form);
+});
+
+// Связываем состояние с View
+onChange(state, (path) => {
+  if (path.startsWith("form")) {
+    view.render(state.form);
+  }
+});

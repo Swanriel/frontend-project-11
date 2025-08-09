@@ -1,45 +1,37 @@
-import onChange from "on-change";
-
 export default class View {
   constructor(form, input, feedback) {
     this.form = form;
     this.input = input;
     this.feedback = feedback;
-    this.state = onChange(
-      {
-        form: {
-          valid: true,
-          error: null,
-          value: "",
-        },
-        feeds: [],
-      },
-      this.render.bind(this),
-    );
   }
 
-  render(path) {
-    if (path === "state.form.error") {
-      this.handleError();
+  render(formState) {
+    switch (formState.state) {
+      case "sending":
+        this.input.setAttribute("readonly", true);
+        break;
+      case "error":
+        this.input.classList.add("is-invalid");
+        this.feedback.textContent = formState.error;
+        this.feedback.style.display = "block";
+        this.input.removeAttribute("readonly");
+        break;
+      case "success":
+        this.input.classList.remove("is-invalid");
+        this.feedback.style.display = "none";
+        this.input.removeAttribute("readonly");
+        break;
+      default:
+        if (formState.valid) {
+          this.input.classList.remove("is-invalid");
+          this.feedback.style.display = "none";
+        }
+        this.input.removeAttribute("readonly");
     }
-    if (path === "state.form.valid") {
-      this.handleValidation();
-    }
-  }
-
-  handleError() {
-    this.feedback.textContent = this.state.form.error;
-    this.feedback.classList.toggle("text-danger", !this.state.form.valid);
-  }
-
-  handleValidation() {
-    this.input.classList.toggle("is-invalid", !this.state.form.valid);
   }
 
   resetForm() {
-    this.state.form.value = "";
-    this.state.form.error = null;
-    this.state.form.valid = true;
+    this.form.reset();
     this.input.focus();
   }
 }

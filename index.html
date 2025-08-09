@@ -1,24 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSS Aggregator</title>
-  <script type="module" src="/src/main.js"></script>
-</head>
-<body>
-  <div class="container mt-5">
-    <h1 class="text-center">RSS Aggregator</h1>
-    <form id="rss-form" class="mt-4">
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="RSS URL" required>
-            <button class="btn btn-primary" type="submit">Add</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RSS Aggregator</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script type="module" src="/src/main.js"></script>
+    <style>
+      .feedback {
+        height: 20px;
+        font-size: 0.9rem;
+      }
+      body {
+        background-color: #f8f9fa;
+      }
+      .container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-top: 3rem;
+      }
+      #rss-form {
+        margin-top: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="text-center">
+        <h1 class="display-4 mb-4">RSS Aggregator</h1>
+        <p class="lead text-muted">
+          Start reading RSS feeds in a clean, distraction-free environment
+        </p>
+      </div>
+
+      <form id="rss-form">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="url-input"
+                placeholder="Enter RSS URL"
+                required
+                autocomplete="off"
+                autofocus
+              />
+              <label for="url-input">RSS URL</label>
+              <div class="feedback text-center mt-2"></div>
+              <div class="form-text text-center">
+                Example: https://example.com/rss.xml
+              </div>
+            </div>
           </div>
         </div>
+        <div class="d-grid gap-2 col-md-4 mx-auto mt-3">
+          <button class="btn btn-primary btn-lg" type="submit">Add Feed</button>
+        </div>
+      </form>
+
+      <div id="feeds-container" class="mt-5">
+        <h2 class="h4 text-center mb-4">Your Feeds</h2>
+        <div class="list-group" id="feeds-list"></div>
       </div>
-    </form>
-  </div>
-</body>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

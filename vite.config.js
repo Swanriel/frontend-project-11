@@ -2,10 +2,10 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
-  base: '/',
+  root: path.resolve(__dirname, './'),
+  publicDir: 'public',
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
@@ -14,6 +14,6 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: true,
+    hot: true,
   },
 });

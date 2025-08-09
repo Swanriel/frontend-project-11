@@ -4,6 +4,6 @@ After completing all the steps in the project, automatic tests will become avail
 
 The hexlet-check.yml file is responsible for running these tests - do not delete this file, edit it, or rename the repository.
 
-[![Vercel](https://vercel.com/button)](https://frontend-project-11-2algfmrq7-olesias-projects-3a68a2a5.vercel.app)
+[![Vercel](https://vercel.com/button)](https://frontend-project-11-eff9dd3us-olesias-projects-3a68a2a5.vercel.app/)
 
-Live Demo: [https://frontend-project-11-2algfmrq7-olesias-projects-3a68a2a5.vercel.app](https://frontend-project-11-2algfmrq7-olesias-projects-3a68a2a5.vercel.app)
+Live Demo: [https://frontend-project-11-2algfmrq7-olesias-projects-3a68a2a5.vercel.app](https://frontend-project-11-eff9dd3us-olesias-projects-3a68a2a5.vercel.app/)

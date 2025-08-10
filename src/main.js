@@ -89,6 +89,33 @@ const renderPosts = (posts, viewedPostIds, container) => {
   container.appendChild(postsContainer);
 };
 
+const checkForUpdates = (state) => {
+  if (state.feeds.length === 0) return;
+
+  state.feeds.forEach(async (feed) => {
+    try {
+      const encodedUrl = encodeURIComponent(feed.url);
+      const proxyUrl = `https://allorigins.hexlet.app/get?url=${encodedUrl}&disableCache=true`;
+      const response = await axios.get(proxyUrl, { timeout: 5000 });
+
+      if (!response.data?.contents) return;
+
+      const { posts: newPosts } = parseRSS(response.data.contents);
+      const existingPostLinks = new Set(state.posts.map(post => post.link));
+      
+      const uniqueNewPosts = newPosts.filter(
+        post => !existingPostLinks.has(post.link)
+      );
+
+      if (uniqueNewPosts.length > 0) {
+        state.posts.unshift(...uniqueNewPosts);
+      }
+    } catch (err) {
+      console.error(`Error updating feed ${feed.url}:`, err);
+    }
+  });
+};
+
 const app = () => {
   const state = {
     form: {
@@ -158,18 +185,20 @@ const app = () => {
     }
 
     if (path === 'feeds') {
-      renderFeeds(state.feeds, elements.feedsContainer, i18n);
+      renderFeeds(state.feeds, elements.feedsContainer);
     }
 
     if (path === 'posts' || path === 'ui.viewedPostIds') {
-      renderPosts(
-        state.posts,
-        state.ui.viewedPostIds,
-        elements.feedsContainer,
-        i18n,
-      );
+      renderPosts(state.posts, state.ui.viewedPostIds, elements.feedsContainer);
     }
   });
+
+  const startUpdateTimer = () => {
+    setTimeout(() => {
+      checkForUpdates(watchedState);
+      startUpdateTimer();
+    }, 5000);
+  };
 
   elements.formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -193,6 +222,10 @@ const app = () => {
       watchedState.feeds.unshift(feedWithUrl);
       watchedState.posts.unshift(...posts);
       watchedState.form.process = 'success';
+
+      if (watchedState.feeds.length === 1) {
+        startUpdateTimer();
+      }
     } catch (err) {
       console.error('Error:', err);
       watchedState.form.error = getErrorKey(err);

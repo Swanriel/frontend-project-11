@@ -73,13 +73,23 @@ const renderPosts = (posts, viewedPostIds, container) => {
               .map((post) => {
                 const isViewed = viewedPostIds.has(post.id);
                 return `
-            <a href="${post.link}" 
-               class="list-group-item list-group-item-action ${isViewed ? 'text-secondary' : 'fw-bold'}" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               data-id="${post.id}">
-              ${post.title}
-            </a>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="${post.link}" 
+                 class="${isViewed ? 'fw-normal' : 'fw-bold'}" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 data-id="${post.id}">
+                ${post.title}
+              </a>
+              <button type="button" 
+                      class="btn btn-sm btn-outline-primary preview-btn" 
+                      data-id="${post.id}"
+                      data-post-link="${post.link}"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#postModal">
+                Просмотр
+              </button>
+            </div>
           `;
               })
               .join('')
@@ -87,6 +97,33 @@ const renderPosts = (posts, viewedPostIds, container) => {
     </div>
   `;
   container.appendChild(postsContainer);
+};
+
+const initModal = () => {
+  if (!document.getElementById('postModal')) {
+    const modalHTML = `
+    <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="postModalLabel">Заголовок поста</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <h6 class="feed-title mb-2 text-muted"></h6>
+            <div class="post-content"></div>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-primary read-full" target="_blank">Читать полностью</a>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  }
+  return new bootstrap.Modal(document.getElementById('postModal'));
 };
 
 const checkForUpdates = (state) => {
@@ -117,6 +154,9 @@ const checkForUpdates = (state) => {
 };
 
 const app = () => {
+  initModal();
+  const postModal = new bootstrap.Modal(document.getElementById('postModal'));
+
   const state = {
     form: {
       process: 'filling',
@@ -127,6 +167,7 @@ const app = () => {
     posts: [],
     ui: {
       viewedPostIds: new Set(),
+      currentPost: null,
     },
   };
 
@@ -142,8 +183,22 @@ const app = () => {
     labelEl: document.querySelector('label[for="url-input"]'),
   };
 
+  const updateModalContent = (postId) => {
+    const post = state.posts.find(p => p.id === postId);
+    if (!post) return;
+
+    const feed = state.feeds.find(f => 
+      state.posts.some(p => p.id === postId)
+    );
+
+    document.getElementById('postModalLabel').textContent = post.title;
+    document.querySelector('.feed-title').textContent = feed?.title || '';
+    document.querySelector('.post-content').innerHTML = post.description;
+    document.querySelector('.read-full').href = post.link;
+  };
+
   const updateUITexts = () => {
-    elements.titleEl.textContent = i18n.t('app.title');
+    elements.titleEl.textContent = i18n.t('RSS Aggregator');
     elements.labelEl.textContent = i18n.t('form.label');
     elements.inputEl.placeholder = i18n.t('form.placeholder');
     elements.submitText.textContent = i18n.t('form.submit');
@@ -250,10 +305,21 @@ const app = () => {
   };
 
   elements.feedsContainer.addEventListener('click', (e) => {
-    const postLink = e.target.closest('[data-id]');
+    const postLink = e.target.closest('a');
     if (postLink) {
       const { id } = postLink.dataset;
-      watchedState.ui.viewedPostIds.add(id);
+      const newSet = new Set(watchedState.ui.viewedPostIds);
+      newSet.add(id);
+      watchedState.ui.viewedPostIds = newSet;
+    }
+
+    const previewBtn = e.target.closest('.preview-btn');
+    if (previewBtn) {
+      const { id } = previewBtn.dataset;
+      const newSet = new Set(watchedState.ui.viewedPostIds);
+      newSet.add(id);
+      watchedState.ui.viewedPostIds = newSet;
+      updateModalContent(id);
     }
   });
 
@@ -265,6 +331,8 @@ const app = () => {
       i18n.changeLanguage(btn.dataset.lng);
     });
   });
+
+  updateUITexts();
 };
 
 app();

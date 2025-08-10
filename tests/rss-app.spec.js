@@ -2,16 +2,13 @@ import { test, expect } from '@playwright/test';
 
 test.describe('RSS Агрегатор', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5175/');
-    // Ждем загрузки основного интерфейса
+    await page.goto('https://frontend-project-11-97taoknlf-olesias-projects-3a68a2a5.vercel.app/');
     await page.waitForSelector('h1');
   });
 
   test('Должен отображать основные элементы формы', async ({ page }) => {
-    // Проверяем заголовок
     await expect(page.locator('h1')).toBeVisible();
     
-    // Проверяем форму
     await expect(page.getByLabel('Ссылка RSS')).toBeVisible();
     await expect(page.getByPlaceholder('https://example.com/rss.xml')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Добавить' })).toBeVisible();
@@ -21,12 +18,10 @@ test.describe('RSS Агрегатор', () => {
     await page.getByPlaceholder('https://example.com/rss.xml').fill('не-ссылка');
     await page.getByRole('button', { name: 'Добавить' }).click();
     
-    // Ждем появления ошибки
     await expect(page.getByText(/Ссылка должна быть валидным URL|Invalid URL/)).toBeVisible();
   });
 
   test('Должен успешно загружать RSS', async ({ page }) => {
-    // Мокаем ответ сервера
     await page.route('**/get?url=*', route => {
       route.fulfill({
         status: 200,
@@ -49,7 +44,6 @@ test.describe('RSS Агрегатор', () => {
     await page.getByPlaceholder('https://example.com/rss.xml').fill('https://example.com/valid.rss');
     await page.getByRole('button', { name: 'Добавить' }).click();
     
-    // Ждем успешной загрузки
     await expect(page.getByText(/RSS успешно загружен|RSS successfully loaded/)).toBeVisible();
     await expect(page.getByText('Тестовый фид')).toBeVisible();
     await expect(page.getByText('Тестовый пост')).toBeVisible();

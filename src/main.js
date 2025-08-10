@@ -154,8 +154,8 @@ const checkForUpdates = (state) => {
 };
 
 const app = () => {
-  initModal();
-  const postModal = new bootstrap.Modal(document.getElementById('postModal'));
+  const modal = initModal();
+  const modalElement = document.getElementById('postModal');
 
   const state = {
     form: {
@@ -197,6 +197,7 @@ const app = () => {
     document.querySelector('.feed-title').textContent = feed?.title || '';
     document.querySelector('.post-content').innerHTML = post.description;
     document.querySelector('.read-full').href = post.link;
+    state.ui.currentPost = postId;
   };
 
   const updateUITexts = () => {
@@ -323,6 +324,12 @@ const app = () => {
       const { id } = previewBtn.dataset;
       watchedState.ui.viewedPostIds.add(id);
       updateModalContent(id);
+    }
+  });
+
+  modalElement.addEventListener('show.bs.modal', () => {
+    if (state.ui.currentPost) {
+      watchedState.ui.viewedPostIds.add(state.ui.currentPost);
     }
   });
 

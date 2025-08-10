@@ -6,7 +6,7 @@ export default defineConfig({
   retries: 1,
   workers: 1,
   use: {
-    baseURL: 'http://localhost:5174',
+    baseURL: 'http://localhost:5175/',
     headless: true,
     viewport: { width: 1280, height: 720 },
     screenshot: 'only-on-failure',

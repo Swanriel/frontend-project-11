@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('RSS Агрегатор', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5174/');
+    await page.goto('http://localhost:5175/');
     // Ждем загрузки основного интерфейса
     await page.waitForSelector('h1');
   });

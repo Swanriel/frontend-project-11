@@ -9,9 +9,10 @@ import { rssSchema } from './validation.js';
 const app = () => {
   const state = {
     form: {
-      process: 'filling', // filling, sending, success, error
+      process: 'filling',
       error: null,
       valid: true,
+      url: '',
     },
     feeds: [],
     posts: [],
@@ -20,45 +21,70 @@ const app = () => {
     },
   };
 
-  // Элементы DOM
   const elements = {
     formEl: document.getElementById('rss-form'),
     inputEl: document.getElementById('url-input'),
     feedbackEl: document.querySelector('.invalid-feedback'),
     feedsContainer: document.getElementById('feeds-container'),
+    submitBtn: document.querySelector('#rss-form button[type="submit"]'),
   };
 
-  // Инициализация View
-  const watchedState = view(state, elements.formEl, elements.inputEl);
+  const watchedState = onChange(state, (path) => {
+    if (path === 'form.error') {
+      elements.inputEl.classList.toggle('is-invalid', !!state.form.error);
+      elements.feedbackEl.textContent = state.form.error || '';
+    }
 
-  // Рендер фидов
+    if (path === 'form.process') {
+      switch (state.form.process) {
+        case 'sending':
+          elements.submitBtn.disabled = true;
+          elements.inputEl.readOnly = true;
+          break;
+        case 'success':
+          elements.formEl.reset();
+          elements.inputEl.focus();
+          elements.submitBtn.disabled = false;
+          elements.inputEl.readOnly = false;
+          elements.inputEl.classList.remove('is-invalid');
+          state.form.error = null;
+          break;
+        case 'error':
+          elements.submitBtn.disabled = false;
+          elements.inputEl.readOnly = false;
+          break;
+        default:
+          break;
+      }
+    }
+  });
+
   const renderFeeds = (feeds) => {
     elements.feedsContainer.innerHTML = feeds
       .map(
         (feed) => `
-      <div class="card mb-3">
-        <div class="card-body">
-          <h5 class="card-title">${feed.title}</h5>
-          <p class="card-text">${feed.description}</p>
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">${feed.title}</h5>
+            <p class="card-text">${feed.description}</p>
+          </div>
         </div>
-      </div>
-    `,
+      `,
       )
       .join('');
   };
 
-  // Рендер постов
   const renderPosts = (posts) => {
     const postsHtml = posts
       .map(
         (post) => `
-      <a href="${post.link}" 
-         class="list-group-item list-group-item-action"
-         target="_blank"
-         data-id="${post.id}">
-        ${post.title}
-      </a>
-    `,
+        <a href="${post.link}" 
+           class="list-group-item list-group-item-action"
+           target="_blank"
+           data-id="${post.id}">
+          ${post.title}
+        </a>
+      `,
       )
       .join('');
 
@@ -70,7 +96,6 @@ const app = () => {
     `;
   };
 
-  // Парсер RSS
   const parseRSS = (xmlString) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(xmlString, 'text/xml');
@@ -96,28 +121,30 @@ const app = () => {
     };
   };
 
-  // Обработчик формы
   elements.formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url').trim();
 
     try {
-      await rssSchema(watchedState.feeds).validate({ url });
+      await rssSchema(state.feeds.map((f) => f.url)).validate({ url });
       watchedState.form.process = 'sending';
+      watchedState.form.error = null;
 
-      // Загрузка через прокси
       const proxyUrl = `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}&disableCache=true`;
       const response = await axios.get(proxyUrl);
 
       if (!response.data.contents) throw new Error('Network error');
 
       const { feed, posts } = parseRSS(response.data.contents);
-      watchedState.feeds.push(feed);
-      watchedState.posts.push(...posts);
+
+      // Добавляем URL в фид для проверки дубликатов
+      const feedWithUrl = { ...feed, url };
+
+      watchedState.feeds.unshift(feedWithUrl);
+      watchedState.posts.unshift(...posts);
       watchedState.form.process = 'success';
 
-      // Рендер после успешной загрузки
       renderFeeds(watchedState.feeds);
       renderPosts(watchedState.posts);
     } catch (err) {

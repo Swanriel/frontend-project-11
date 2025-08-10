@@ -7,12 +7,10 @@ export default (state, formEl, inputEl) => {
       const feedbackEl = inputEl.nextElementSibling;
       if (feedbackEl) feedbackEl.textContent = state.form.error || '';
     }
-    if (path === 'form.process') {
-      if (state.form.process === 'success') {
-        formEl.reset();
-        inputEl.focus();
-        inputEl.classList.remove('is-invalid');
-      }
+    if (path === 'form.process' && state.form.process === 'success') {
+      formEl.reset();
+      inputEl.focus();
+      inputEl.classList.remove('is-invalid');
     }
   });
 

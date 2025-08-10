@@ -1,0 +1,22 @@
+{
+  "form": {
+    "title": "RSS Агрегатор",
+    "label": "Ссылка RSS",
+    "placeholder": "https://example.com/rss.xml",
+    "submit": "Добавить",
+    "loading": "Загрузка..."
+  },
+  "feeds": {
+    "title": "Фиды",
+    "posts": "Посты"
+  },
+  "errors": {
+    "required": "Обязательное поле",
+    "url": "Введите корректный URL",
+    "notOneOf": "Этот RSS-канал уже добавлен",
+    "invalidRSS": "Ресурс не содержит валидный RSS",
+    "networkError": "Ошибка сети. Попробуйте снова",
+    "unknown": "Произошла неизвестная ошибка"
+  },
+  "success": "RSS-канал успешно добавлен!"
+}

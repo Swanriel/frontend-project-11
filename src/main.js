@@ -1,9 +1,10 @@
+import './i18n';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import * as yup from 'yup';
-import onChange from 'on-change';
 import axios from 'axios';
 import uniqueId from 'lodash/uniqueId';
-import { rssSchema } from './validation.js';
+import onChange from 'on-change';
+import { i18n } from './i18n';
+import { rssSchema } from './validation';
 
 const parseRSS = (xmlString) => {
   const parser = new DOMParser();
@@ -37,6 +38,57 @@ const parseRSS = (xmlString) => {
   };
 };
 
+const renderFeeds = (feeds, container) => {
+  container.innerHTML = `
+    <h2>${i18n.t('feeds.title')}</h2>
+    ${
+      feeds.length === 0
+        ? `<p class="text-muted">${i18n.t('feeds.empty')}</p>`
+        : feeds
+            .map(
+              (feed) => `
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">${feed.title}</h5>
+            <p class="card-text">${feed.description}</p>
+          </div>
+        </div>
+      `,
+            )
+            .join('')
+    }
+  `;
+};
+
+const renderPosts = (posts, viewedPostIds, container) => {
+  const postsContainer = document.createElement('div');
+  postsContainer.className = 'mt-4';
+  postsContainer.innerHTML = `
+    <h2>${i18n.t('posts.title')}</h2>
+    <div class="list-group">
+      ${
+        posts.length === 0
+          ? `<p class="text-muted">${i18n.t('posts.empty')}</p>`
+          : posts
+              .map((post) => {
+                const isViewed = viewedPostIds.has(post.id);
+                return `
+            <a href="${post.link}" 
+               class="list-group-item list-group-item-action ${isViewed ? 'text-secondary' : 'fw-bold'}" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               data-id="${post.id}">
+              ${post.title}
+            </a>
+          `;
+              })
+              .join('')
+      }
+    </div>
+  `;
+  container.appendChild(postsContainer);
+};
+
 const app = () => {
   const state = {
     form: {
@@ -59,12 +111,23 @@ const app = () => {
     submitText: document.getElementById('submit-text'),
     submitSpinner: document.getElementById('submit-spinner'),
     feedsContainer: document.getElementById('feeds-container'),
+    titleEl: document.querySelector('h1'),
+    labelEl: document.querySelector('label[for="url-input"]'),
+  };
+
+  const updateUITexts = () => {
+    elements.titleEl.textContent = i18n.t('app.title');
+    elements.labelEl.textContent = i18n.t('form.label');
+    elements.inputEl.placeholder = i18n.t('form.placeholder');
+    elements.submitText.textContent = i18n.t('form.submit');
   };
 
   const watchedState = onChange(state, (path) => {
     if (path === 'form.error') {
       elements.inputEl.classList.toggle('is-invalid', !!state.form.error);
-      elements.feedbackEl.textContent = state.form.error || '';
+      elements.feedbackEl.textContent = state.form.error
+        ? i18n.t(`errors.${state.form.error}`)
+        : '';
       elements.feedbackEl.style.display = state.form.error ? 'block' : 'none';
     }
 
@@ -72,21 +135,21 @@ const app = () => {
       switch (state.form.process) {
         case 'sending':
           elements.submitBtn.disabled = true;
-          elements.submitText.textContent = 'Loading...';
+          elements.submitText.textContent = i18n.t('form.loading');
           elements.submitSpinner.classList.remove('d-none');
           break;
         case 'success':
           elements.formEl.reset();
           elements.inputEl.focus();
           elements.submitBtn.disabled = false;
-          elements.submitText.textContent = 'Add feed';
+          elements.submitText.textContent = i18n.t('form.submit');
           elements.submitSpinner.classList.add('d-none');
           elements.inputEl.classList.remove('is-invalid');
           state.form.error = null;
           break;
         case 'error':
           elements.submitBtn.disabled = false;
-          elements.submitText.textContent = 'Add feed';
+          elements.submitText.textContent = i18n.t('form.submit');
           elements.submitSpinner.classList.add('d-none');
           break;
         default:
@@ -95,51 +158,18 @@ const app = () => {
     }
 
     if (path === 'feeds') {
-      renderFeeds();
+      renderFeeds(state.feeds, elements.feedsContainer, i18n);
     }
 
-    if (path === 'posts') {
-      renderPosts();
+    if (path === 'posts' || path === 'ui.viewedPostIds') {
+      renderPosts(
+        state.posts,
+        state.ui.viewedPostIds,
+        elements.feedsContainer,
+        i18n,
+      );
     }
   });
-
-  const renderFeeds = () => {
-    elements.feedsContainer.innerHTML = state.feeds
-      .map(
-        (feed) => `
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">${feed.title}</h5>
-          <p class="card-text">${feed.description}</p>
-        </div>
-      </div>
-    `,
-      )
-      .join('');
-  };
-
-  const renderPosts = () => {
-    const postsHtml = state.posts
-      .map(
-        (post) => `
-      <a href="${post.link}" 
-         class="list-group-item list-group-item-action ${state.ui.viewedPostIds.has(post.id) ? 'text-secondary' : 'fw-bold'}" 
-         target="_blank" 
-         rel="noopener noreferrer"
-         data-id="${post.id}">
-        ${post.title}
-      </a>
-    `,
-      )
-      .join('');
-
-    elements.feedsContainer.innerHTML += `
-      <div class="mt-4">
-        <h2>Posts</h2>
-        <div class="list-group">${postsHtml}</div>
-      </div>
-    `;
-  };
 
   elements.formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -151,8 +181,9 @@ const app = () => {
       watchedState.form.process = 'sending';
       watchedState.form.error = null;
 
-      const proxyUrl = `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}&disableCache=true`;
-      const response = await axios.get(proxyUrl);
+      const encodedUrl = encodeURIComponent(url);
+      const proxyUrl = `https://allorigins.hexlet.app/get?url=${encodedUrl}&disableCache=true`;
+      const response = await axios.get(proxyUrl, { timeout: 10000 });
 
       if (!response.data?.contents) throw new Error('networkError');
 
@@ -163,36 +194,44 @@ const app = () => {
       watchedState.posts.unshift(...posts);
       watchedState.form.process = 'success';
     } catch (err) {
-      console.error(err);
-      watchedState.form.error = getErrorMessage(err);
+      console.error('Error:', err);
+      watchedState.form.error = getErrorKey(err);
       watchedState.form.process = 'error';
     }
   });
 
+  const getErrorKey = (err) => {
+    if (err.name === 'AxiosError') {
+      if (err.code === 'ECONNABORTED') return 'timeout';
+      return 'networkError';
+    }
+
+    switch (err.message) {
+      case 'invalidRSS':
+        return 'invalidRSS';
+      case 'networkError':
+        return 'networkError';
+      default:
+        return err.type || 'unknown';
+    }
+  };
+
   elements.feedsContainer.addEventListener('click', (e) => {
     const postLink = e.target.closest('[data-id]');
     if (postLink) {
-      const postId = postLink.dataset.id;
-      watchedState.ui.viewedPostIds.add(postId);
+      const { id } = postLink.dataset;
+      watchedState.ui.viewedPostIds.add(id);
     }
   });
 
-  function getErrorMessage(err) {
-    switch (err.message) {
-      case 'invalidRSS':
-        return 'Ресурс не содержит валидный RSS/Atom';
-      case 'networkError':
-        return 'Ошибка сети. Проверьте URL и попробуйте снова';
-      case 'This RSS feed already exists':
-        return 'Этот RSS-канал уже добавлен';
-      case 'URL is required':
-        return 'Введите URL RSS-канала';
-      case 'Must be a valid URL':
-        return 'Введите корректный URL';
-      default:
-        return 'Неизвестная ошибка';
-    }
-  }
+  i18n.on('loaded', updateUITexts);
+  i18n.on('languageChanged', updateUITexts);
+
+  document.querySelectorAll('[data-lng]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      i18n.changeLanguage(btn.dataset.lng);
+    });
+  });
 };
 
 app();

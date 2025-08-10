@@ -29,6 +29,8 @@
         border-radius: 50%;
         border-top-color: #fff;
         animation: spin 1s ease-in-out infinite;
+        margin-left: 0.5rem;
+        vertical-align: middle;
       }
       @keyframes spin {
         to {
@@ -39,27 +41,40 @@
   </head>
   <body>
     <div class="container mt-5">
+      <div class="text-end mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-2" data-lng="en">
+          English
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" data-lng="ru">
+          Русский
+        </button>
+      </div>
+
       <div class="row justify-content-center">
         <div class="col-md-8">
-          <h1 class="text-center mb-4">RSS Aggregator</h1>
+          <h1 class="text-center mb-4" data-i18n="form.title">
+            RSS Aggregator
+          </h1>
           <form id="rss-form">
             <div class="mb-3">
-              <label for="url-input" class="form-label">RSS URL</label>
+              <label for="url-input" class="form-label" data-i18n="form.label"
+                >RSS URL</label
+              >
               <div class="input-group">
                 <input
                   type="text"
                   class="form-control"
                   id="url-input"
                   name="url"
-                  placeholder="https://example.com/rss.xml"
+                  data-i18n-placeholder="form.placeholder"
                   required
                   autofocus
                 />
                 <button class="btn btn-primary" type="submit" id="submit-btn">
-                  <span id="submit-text">Add feed</span>
+                  <span id="submit-text" data-i18n="form.submit">Add feed</span>
                   <span
                     id="submit-spinner"
-                    class="loading-spinner ms-2 d-none"
+                    class="loading-spinner d-none"
                   ></span>
                 </button>
               </div>

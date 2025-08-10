@@ -8,7 +8,8 @@ const initI18n = () => {
     .use(Backend)
     .use(LanguageDetector)
     .init({
-      fallbackLng: 'en',
+      fallbackLng: 'ru',
+      lng: 'ru', // Явно устанавливаем русский язык
       debug: false,
       interpolation: {
         escapeValue: false,

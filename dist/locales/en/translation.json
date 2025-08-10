@@ -1,0 +1,22 @@
+{
+  "form": {
+    "title": "RSS Aggregator",
+    "label": "RSS URL",
+    "placeholder": "https://example.com/rss.xml",
+    "submit": "Add feed",
+    "loading": "Loading..."
+  },
+  "feeds": {
+    "title": "Feeds",
+    "posts": "Posts"
+  },
+  "errors": {
+    "required": "URL is required",
+    "url": "Must be a valid URL",
+    "notOneOf": "This RSS feed already exists",
+    "invalidRSS": "Resource doesn't contain valid RSS",
+    "networkError": "Network error. Please try again",
+    "unknown": "Unknown error occurred"
+  },
+  "success": "RSS feed added successfully!"
+}

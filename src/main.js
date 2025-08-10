@@ -308,17 +308,13 @@ const app = () => {
     const postLink = e.target.closest('a');
     if (postLink) {
       const { id } = postLink.dataset;
-      const newSet = new Set(watchedState.ui.viewedPostIds);
-      newSet.add(id);
-      watchedState.ui.viewedPostIds = newSet;
+      watchedState.ui.viewedPostIds.add(id);
     }
 
     const previewBtn = e.target.closest('.preview-btn');
     if (previewBtn) {
       const { id } = previewBtn.dataset;
-      const newSet = new Set(watchedState.ui.viewedPostIds);
-      newSet.add(id);
-      watchedState.ui.viewedPostIds = newSet;
+      watchedState.ui.viewedPostIds.add(id);
       updateModalContent(id);
     }
   });

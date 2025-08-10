@@ -10,35 +10,75 @@
     />
     <style>
       .invalid-feedback {
-        display: block;
-        height: 20px;
+        display: none;
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
       }
       .is-invalid {
         border-color: #dc3545 !important;
       }
+      #feeds-container .card {
+        margin-bottom: 1rem;
+      }
+      .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 0.5rem;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
-    <script type="module" crossorigin src="/assets/main-dcb07a39.js"></script>
+    <script type="module" crossorigin src="/assets/index-f4167649.js"></script>
     <link rel="stylesheet" href="/assets/index-4f578f38.css">
   </head>
   <body>
     <div class="container mt-5">
+      <div class="text-end mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-2" data-lng="en">
+          English
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" data-lng="ru">
+          Русский
+        </button>
+      </div>
+
       <div class="row justify-content-center">
         <div class="col-md-8">
-          <h1 class="text-center mb-4">RSS Aggregator</h1>
+          <h1 class="text-center mb-4" data-i18n="form.title">
+            RSS Aggregator
+          </h1>
           <form id="rss-form">
             <div class="mb-3">
-              <label for="url-input" class="form-label">RSS URL</label>
+              <label for="url-input" class="form-label" data-i18n="form.label"
+                >RSS URL</label
+              >
               <div class="input-group">
                 <input
                   type="text"
                   class="form-control"
                   id="url-input"
                   name="url"
-                  placeholder="https://example.com/rss.xml"
+                  data-i18n-placeholder="form.placeholder"
                   required
                   autofocus
                 />
-                <button class="btn btn-primary" type="submit">Add feed</button>
+                <button class="btn btn-primary" type="submit" id="submit-btn">
+                  <span id="submit-text" data-i18n="form.submit">Add feed</span>
+                  <span
+                    id="submit-spinner"
+                    class="loading-spinner d-none"
+                  ></span>
+                </button>
               </div>
               <div class="invalid-feedback"></div>
             </div>

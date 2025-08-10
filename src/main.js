@@ -87,7 +87,7 @@ const renderPosts = (posts, viewedPostIds, container) => {
                       data-post-link="${post.link}"
                       data-bs-toggle="modal" 
                       data-bs-target="#postModal">
-                Просмотр
+                ${i18n.t('posts.preview')}
               </button>
             </div>
           `;
@@ -114,8 +114,8 @@ const initModal = () => {
             <div class="post-content"></div>
           </div>
           <div class="modal-footer">
-            <a href="#" class="btn btn-primary read-full" target="_blank">Читать полностью</a>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <a href="#" class="btn btn-primary read-full" target="_blank">${i18n.t('Читать полностью')}</a>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18n.t('Закрыть')}</button>
           </div>
         </div>
       </div>
@@ -162,6 +162,7 @@ const app = () => {
       process: 'filling',
       error: null,
       valid: true,
+      feedback: null,
     },
     feeds: [],
     posts: [],
@@ -174,7 +175,8 @@ const app = () => {
   const elements = {
     formEl: document.getElementById('rss-form'),
     inputEl: document.getElementById('url-input'),
-    feedbackEl: document.querySelector('.invalid-feedback'),
+    invalidFeedbackEl: document.querySelector('.invalid-feedback'),
+    validFeedbackEl: document.querySelector('.valid-feedback'),
     submitBtn: document.getElementById('submit-btn'),
     submitText: document.getElementById('submit-text'),
     submitSpinner: document.getElementById('submit-spinner'),
@@ -198,7 +200,7 @@ const app = () => {
   };
 
   const updateUITexts = () => {
-    elements.titleEl.textContent = i18n.t('RSS Aggregator');
+    elements.titleEl.textContent = i18n.t('form.title');
     elements.labelEl.textContent = i18n.t('form.label');
     elements.inputEl.placeholder = i18n.t('form.placeholder');
     elements.submitText.textContent = i18n.t('form.submit');
@@ -207,18 +209,19 @@ const app = () => {
   const watchedState = onChange(state, (path) => {
     if (path === 'form.error') {
       elements.inputEl.classList.toggle('is-invalid', !!state.form.error);
-      elements.feedbackEl.textContent = state.form.error
+      elements.invalidFeedbackEl.textContent = state.form.error
         ? i18n.t(`errors.${state.form.error}`)
         : '';
-      elements.feedbackEl.style.display = state.form.error ? 'block' : 'none';
+      elements.invalidFeedbackEl.style.display = state.form.error ? 'block' : 'none';
     }
 
-    if (path === 'form.process') {
+    if (path === 'form.process' || path === 'form.feedback') {
       switch (state.form.process) {
         case 'sending':
           elements.submitBtn.disabled = true;
           elements.submitText.textContent = i18n.t('form.loading');
           elements.submitSpinner.classList.remove('d-none');
+          elements.validFeedbackEl.style.display = 'none';
           break;
         case 'success':
           elements.formEl.reset();
@@ -227,12 +230,15 @@ const app = () => {
           elements.submitText.textContent = i18n.t('form.submit');
           elements.submitSpinner.classList.add('d-none');
           elements.inputEl.classList.remove('is-invalid');
-          state.form.error = null;
+          elements.validFeedbackEl.textContent = state.form.feedback;
+          elements.validFeedbackEl.style.display = 'block';
+          elements.invalidFeedbackEl.style.display = 'none';
           break;
         case 'error':
           elements.submitBtn.disabled = false;
           elements.submitText.textContent = i18n.t('form.submit');
           elements.submitSpinner.classList.add('d-none');
+          elements.validFeedbackEl.style.display = 'none';
           break;
         default:
           break;
@@ -277,6 +283,7 @@ const app = () => {
       watchedState.feeds.unshift(feedWithUrl);
       watchedState.posts.unshift(...posts);
       watchedState.form.process = 'success';
+      watchedState.form.feedback = i18n.t('success');
 
       if (watchedState.feeds.length === 1) {
         startUpdateTimer();

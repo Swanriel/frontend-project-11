@@ -17,18 +17,15 @@ const parseRSS = (xmlString) => {
   const items = doc.querySelectorAll('item, entry');
 
   const feedTitle = channel.querySelector('title').textContent;
-  const feedDescription =
-    channel.querySelector('description, subtitle')?.textContent || '';
+  const feedDescription = channel.querySelector('description, subtitle')?.textContent || '';
 
   const posts = Array.from(items).map((item) => {
     const linkElement = item.querySelector('link');
     return {
       id: uniqueId(),
       title: item.querySelector('title').textContent,
-      link:
-        linkElement?.getAttribute('href') || linkElement?.textContent || '#',
-      description:
-        item.querySelector('description, content')?.textContent || '',
+      link: linkElement?.getAttribute('href') || linkElement?.textContent || '#',
+      description: item.querySelector('description, content')?.textContent || '',
     };
   });
 
@@ -41,38 +38,36 @@ const parseRSS = (xmlString) => {
 const renderFeeds = (feeds, container) => {
   container.innerHTML = `
     <h2>${i18n.t('feeds.title')}</h2>
-    ${
-      feeds.length === 0
-        ? `<p class="text-muted">${i18n.t('feeds.empty')}</p>`
-        : feeds
-            .map(
-              (feed) => `
+    ${feeds.length === 0
+      ? `<p class="text-muted">${i18n.t('feeds.empty')}</p>`
+      : feeds.map(feed => `
         <div class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">${feed.title}</h5>
             <p class="card-text">${feed.description}</p>
           </div>
         </div>
-      `,
-            )
-            .join('')
+      `).join('')
     }
   `;
 };
 
 const renderPosts = (posts, viewedPostIds, container) => {
+  const prevPostsContainer = container.querySelector('.posts-container');
+  if (prevPostsContainer) {
+    container.removeChild(prevPostsContainer);
+  }
+
   const postsContainer = document.createElement('div');
-  postsContainer.className = 'mt-4';
+  postsContainer.className = 'posts-container mt-4';
   postsContainer.innerHTML = `
     <h2>${i18n.t('posts.title')}</h2>
     <div class="list-group">
-      ${
-        posts.length === 0
-          ? `<p class="text-muted">${i18n.t('posts.empty')}</p>`
-          : posts
-              .map((post) => {
-                const isViewed = viewedPostIds.has(post.id);
-                return `
+      ${posts.length === 0
+        ? `<p class="text-muted">${i18n.t('posts.empty')}</p>`
+        : posts.map(post => {
+          const isViewed = viewedPostIds.has(post.id);
+          return `
             <div class="list-group-item d-flex justify-content-between align-items-center">
               <a href="${post.link}" 
                  class="${isViewed ? 'fw-normal' : 'fw-bold'}" 
@@ -84,15 +79,13 @@ const renderPosts = (posts, viewedPostIds, container) => {
               <button type="button" 
                       class="btn btn-sm btn-outline-primary preview-btn" 
                       data-id="${post.id}"
-                      data-post-link="${post.link}"
                       data-bs-toggle="modal" 
                       data-bs-target="#postModal">
                 ${i18n.t('posts.preview')}
               </button>
             </div>
           `;
-              })
-              .join('')
+        }).join('')
       }
     </div>
   `;
@@ -106,11 +99,10 @@ const initModal = () => {
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="postModalLabel">Заголовок поста</h5>
+            <h5 class="modal-title" id="postModalLabel"></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <h6 class="feed-title mb-2 text-muted"></h6>
             <div class="post-content"></div>
           </div>
           <div class="modal-footer">
@@ -189,13 +181,8 @@ const app = () => {
     const post = state.posts.find(p => p.id === postId);
     if (!post) return;
 
-    const feed = state.feeds.find(f => 
-      state.posts.some(p => p.id === postId)
-    );
-
     document.getElementById('postModalLabel').textContent = post.title;
-    document.querySelector('.feed-title').textContent = feed?.title || '';
-    document.querySelector('.post-content').innerHTML = post.description;
+    document.querySelector('.post-content').textContent = post.description;
     document.querySelector('.read-full').href = post.link;
     state.ui.currentPost = postId;
   };
@@ -331,6 +318,10 @@ const app = () => {
     if (state.ui.currentPost) {
       watchedState.ui.viewedPostIds.add(state.ui.currentPost);
     }
+  });
+
+  modalElement.addEventListener('hidden.bs.modal', () => {
+    watchedState.ui.currentPost = null;
   });
 
   i18n.on('loaded', updateUITexts);

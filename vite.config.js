@@ -2,11 +2,11 @@ import { defineConfig } from 'vite';
 import path from 'path';
 
 export default defineConfig({
-  root: path.resolve(__dirname, './'),
-  publicDir: 'public',
+  base: '/',
   build: {
     outDir: 'dist',
     rollupOptions: {
+      external: ['axios', 'lodash', 'on-change', 'yup'],
       input: {
         main: path.resolve(__dirname, 'index.html'),
       },
@@ -14,6 +14,9 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    hot: true,
+    strictPort: true,
+  },
+  optimizeDeps: {
+    include: ['axios', 'lodash/uniqueId', 'on-change', 'yup'],
   },
 });

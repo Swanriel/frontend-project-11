@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import onChange from 'on-change';
 import axios from 'axios';
-import { uniqueId } from 'lodash';
+import uniqueId from 'lodash/uniqueId';
 import view from './view.js';
 import { rssSchema } from './validation.js';
 

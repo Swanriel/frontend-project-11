@@ -18,9 +18,7 @@ const parseRSS = (xmlString) => {
   const items = doc.querySelectorAll('item, entry')
 
   const feedTitle = channel.querySelector('title').textContent
-  const feedDescription
-  =
-    channel.querySelector('description, subtitle')?.textContent || ''
+  const feedDescription = channel.querySelector('description, subtitle')?.textContent || ''
 
   const posts = Array.from(items).map((item) => {
     const linkElement = item.querySelector('link')
@@ -151,7 +149,8 @@ const checkForUpdates = (state) => {
       if (uniqueNewPosts.length > 0) {
         state.posts.unshift(...uniqueNewPosts)
       }
-    } catch (err) {
+    } catch (err)
+    {
       console.error(`Error updating feed ${feed.url}:`, err)
     }
   })

@@ -7,11 +7,7 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  plugins: [
-    'react',
-    'jsx-a11y',
-    'import',
-  ],
+  plugins: ['react', 'jsx-a11y', 'import'],
   parserOptions: {
     ecmaVersion: 2023,
     sourceType: 'module',
@@ -26,12 +22,10 @@ module.exports = {
     'react/prop-types': 'off',
     'react/static-property-placement': [1, 'static public field'],
     'react/jsx-no-useless-fragment': [0, 'allowExpressions'],
-    'react/jsx-filename-extension': [1,
+    'react/jsx-filename-extension': [
+      1,
       {
-        extensions: [
-          '.jsx',
-          '.tsx',
-        ],
+        extensions: ['.jsx', '.tsx'],
       },
     ],
     'import/extensions': [
@@ -66,24 +60,24 @@ module.exports = {
     // note you must disable the base rule as it can report incorrect errors
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
-    'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
+    'lines-between-class-members': [
+      'error',
+      'always',
+      { exceptAfterSingleLine: true },
+    ],
     'linebreak-style': 0,
   },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',
-      extends: [
-        'plugin:@typescript-eslint/recommended',
-      ],
-      plugins: [
-        '@typescript-eslint',
-      ],
+      extends: ['plugin:@typescript-eslint/recommended'],
+      plugins: ['@typescript-eslint'],
     },
   ],
   settings: {
     react: {
       version: 'detect',
     },
-  }
-}
+  },
+};

@@ -22,15 +22,15 @@ const initI18n = () => {
   setLocale({
     mixed: {
       required: () => i18n.t('errors.required'),
-      notOneOf: () => i18n.t('errors.notOneOf')
+      notOneOf: () => i18n.t('errors.notOneOf'),
     },
     string: {
-      url: () => i18n.t('errors.url')
+      url: () => i18n.t('errors.url'),
     },
   })
 
   return i18n
-};
+}
 
 const i18nInstance = initI18n()
 

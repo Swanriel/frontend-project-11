@@ -16,4 +16,3 @@ export default (state, formEl, inputEl, feedbackEl) => {
 
   return watchedState
 }
-

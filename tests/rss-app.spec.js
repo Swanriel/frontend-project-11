@@ -19,10 +19,10 @@ test.describe('RSS Агрегатор', () => {
     await page.getByRole('button', { name: 'Добавить' }).click()
     
     await expect(page.getByText(/Ссылка должна быть валидным URL|Invalid URL/)).toBeVisible()
-  });
+  })
 
   test('Должен успешно загружать RSS', async ({ page }) => {
-    await page.route('**/get?url=*', route => {
+    await page.route('**/get?url=*', (route) => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -36,8 +36,8 @@ test.describe('RSS Агрегатор', () => {
               <link>https://example.com/test</link>
               <description>Тестовое содержание</description>
             </item>
-          </channel></rss>`
-        })
+          </channel></rss>`,
+        }),
       })
     })
 

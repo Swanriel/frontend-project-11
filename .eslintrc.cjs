@@ -13,16 +13,17 @@ module.exports = {
     'import',
   ],
   parserOptions: {
-    ecmaVersion: 2023, // Allows for the parsing of modern ECMAScript features
-    sourceType: 'module', // Allows for the use of imports
+    ecmaVersion: 2023,
+    sourceType: 'module',
   },
   env: {
     browser: true,
     node: true,
     es6: true,
+    commonjs: true,
   },
   rules: {
-    'react/prop-types': 'off', // Disable prop-types as we use TypeScript for type checking
+    'react/prop-types': 'off',
     'react/static-property-placement': [1, 'static public field'],
     'react/jsx-no-useless-fragment': [0, 'allowExpressions'],
     'react/jsx-filename-extension': [1,
@@ -84,5 +85,5 @@ module.exports = {
     react: {
       version: 'detect',
     },
-  },
-};
+  }
+}

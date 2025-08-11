@@ -16,7 +16,7 @@ const parseRSS = (xmlString) => {
   const channel = doc.querySelector('channel, feed')
   const items = doc.querySelectorAll('item, entry')
 
-  const feedTitle = channel.querySelector('title').textContent;
+  const feedTitle = channel.querySelector('title').textContent
   const feedDescription = channel.querySelector('description, subtitle')?.textContent || ''
 
   const posts = Array.from(items).map((item) => {
@@ -25,22 +25,22 @@ const parseRSS = (xmlString) => {
       id: uniqueId(),
       title: item.querySelector('title').textContent,
       link: linkElement?.getAttribute('href') || linkElement?.textContent || '#',
-      description: item.querySelector('description, content')?.textContent || '',
-    };
-  });
+      description: item.querySelector('description, content')?.textContent || ''
+    }
+  })
 
   return {
     feed: { id: uniqueId(), title: feedTitle, description: feedDescription },
-    posts,
-  };
-};
+    posts
+  }
+}
 
 const renderFeeds = (feeds, container) => {
   container.innerHTML = `
     <h2>${i18n.t('feeds.title')}</h2>
     ${feeds.length === 0
       ? `<p class="text-muted">${i18n.t('feeds.empty')}</p>`
-      : feeds.map(feed => `
+      : feeds.map((feed) => `
         <div class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">${feed.title}</h5>
@@ -49,13 +49,13 @@ const renderFeeds = (feeds, container) => {
         </div>
       `).join('')
     }
-  `;
-};
+  `
+}
 
 const renderPosts = (posts, viewedPostIds, container) => {
   const prevPostsContainer = container.querySelector('.posts-container')
   if (prevPostsContainer) {
-    container.removeChild(prevPostsContainer);
+    container.removeChild(prevPostsContainer)
   }
 
   const postsContainer = document.createElement('div')
@@ -65,7 +65,7 @@ const renderPosts = (posts, viewedPostIds, container) => {
     <div class="list-group">
       ${posts.length === 0
         ? `<p class="text-muted">${i18n.t('posts.empty')}</p>`
-        : posts.map(post => {
+        : posts.map((post) => {
           const isViewed = viewedPostIds.has(post.id)
           return `
             <div class="list-group-item d-flex justify-content-between align-items-center">
@@ -84,39 +84,39 @@ const renderPosts = (posts, viewedPostIds, container) => {
                 ${i18n.t('posts.preview')}
               </button>
             </div>
-          `;
+          `
         }).join('')
       }
     </div>
-  `;
+  `
   container.appendChild(postsContainer)
-};
+}
 
 const initModal = () => {
   if (!document.getElementById('postModal')) {
     const modalHTML = `
-    <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="postModalLabel"></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="post-content"></div>
-          </div>
-          <div class="modal-footer">
-            <a href="#" class="btn btn-primary read-full" target="_blank">${i18n.t('Читать полностью')}</a>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18n.t('Закрыть')}</button>
+      <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="postModalLabel"></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="post-content"></div>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-primary read-full" target="_blank">${i18n.t('Читать полностью')}</a>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18n.t('Закрыть')}</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    `;
+    `
     document.body.insertAdjacentHTML('beforeend', modalHTML)
   }
   return new bootstrap.Modal(document.getElementById('postModal'))
-};
+}
 
 const checkForUpdates = (state) => {
   if (state.feeds.length === 0) return
@@ -130,11 +130,11 @@ const checkForUpdates = (state) => {
       if (!response.data?.contents) return
 
       const { posts: newPosts } = parseRSS(response.data.contents)
-      const existingPostLinks = new Set(state.posts.map(post => post.link))
+      const existingPostLinks = new Set(state.posts.map((post) => post.link))
       
       const uniqueNewPosts = newPosts.filter(
-        post => !existingPostLinks.has(post.link)
-      );
+        (post) => !existingPostLinks.has(post.link)
+      )
 
       if (uniqueNewPosts.length > 0) {
         state.posts.unshift(...uniqueNewPosts)
@@ -154,15 +154,15 @@ const app = () => {
       process: 'filling',
       error: null,
       valid: true,
-      feedback: null,
+      feedback: null
     },
     feeds: [],
     posts: [],
     ui: {
       viewedPostIds: new Set(),
-      currentPost: null,
-    },
-  };
+      currentPost: null
+    }
+  }
 
   const elements = {
     formEl: document.getElementById('rss-form'),
@@ -174,32 +174,32 @@ const app = () => {
     submitSpinner: document.getElementById('submit-spinner'),
     feedsContainer: document.getElementById('feeds-container'),
     titleEl: document.querySelector('h1'),
-    labelEl: document.querySelector('label[for="url-input"]'),
-  };
+    labelEl: document.querySelector('label[for="url-input"]')
+  }
 
   const updateModalContent = (postId) => {
-    const post = state.posts.find(p => p.id === postId)
-    if (!post) return;
+    const post = state.posts.find((p) => p.id === postId)
+    if (!post) return
 
     document.getElementById('postModalLabel').textContent = post.title
     document.querySelector('.post-content').textContent = post.description
     document.querySelector('.read-full').href = post.link
     state.ui.currentPost = postId
-  };
+  }
 
   const updateUITexts = () => {
     elements.titleEl.textContent = i18n.t('form.title')
     elements.labelEl.textContent = i18n.t('form.label')
     elements.inputEl.placeholder = i18n.t('form.placeholder')
     elements.submitText.textContent = i18n.t('form.submit')
-  };
+  }
 
   const watchedState = onChange(state, (path) => {
     if (path === 'form.error') {
       elements.inputEl.classList.toggle('is-invalid', !!state.form.error)
       elements.invalidFeedbackEl.textContent = state.form.error
         ? i18n.t(`errors.${state.form.error}`)
-        : '';
+        : ''
       elements.invalidFeedbackEl.style.display = state.form.error ? 'block' : 'none'
     }
 
@@ -211,7 +211,7 @@ const app = () => {
           elements.submitSpinner.classList.remove('d-none')
           elements.validFeedbackEl.style.display = 'none'
           break
-          case 'success':
+        case 'success':
           elements.formEl.reset()
           elements.inputEl.focus()
           elements.submitBtn.disabled = false
@@ -240,7 +240,7 @@ const app = () => {
     if (path === 'posts' || path === 'ui.viewedPostIds') {
       renderPosts(state.posts, state.ui.viewedPostIds, elements.feedsContainer)
     }
-  });
+  })
 
   const startUpdateTimer = () => {
     setTimeout(() => {
@@ -250,7 +250,7 @@ const app = () => {
   }
 
   elements.formEl.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     const formData = new FormData(e.target)
     const url = formData.get('url').trim()
 
@@ -281,7 +281,7 @@ const app = () => {
       watchedState.form.error = getErrorKey(err)
       watchedState.form.process = 'error'
     }
-  });
+  })
 
   const getErrorKey = (err) => {
     if (err.name === 'AxiosError') {
@@ -312,7 +312,7 @@ const app = () => {
       watchedState.ui.viewedPostIds.add(id)
       updateModalContent(id)
     }
-  });
+  })
 
   modalElement.addEventListener('show.bs.modal', () => {
     if (state.ui.currentPost) {
@@ -322,7 +322,7 @@ const app = () => {
 
   modalElement.addEventListener('hidden.bs.modal', () => {
     watchedState.ui.currentPost = null
-  });
+  })
 
   i18n.on('loaded', updateUITexts)
   i18n.on('languageChanged', updateUITexts)

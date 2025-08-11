@@ -18,7 +18,8 @@ const parseRSS = (xmlString) => {
   const items = doc.querySelectorAll('item, entry')
 
   const feedTitle = channel.querySelector('title').textContent
-  const feedDescription =
+  const feedDescription
+  =
     channel.querySelector('description, subtitle')?.textContent || ''
 
   const posts = Array.from(items).map((item) => {
@@ -148,7 +149,8 @@ const checkForUpdates = (state) => {
       )
 
       if (uniqueNewPosts.length > 0) {
-        state.posts.unshift(...uniqueNewPosts)}
+        state.posts.unshift(...uniqueNewPosts)
+      }
     } catch (err) {
       console.error(`Error updating feed ${feed.url}:`, err)
     }
@@ -156,7 +158,7 @@ const checkForUpdates = (state) => {
 }
 
 const app = () => {
-  initModal();
+  initModal()
   const modalElement = document.getElementById('postModal')
 
   const state = {
@@ -188,7 +190,7 @@ const app = () => {
   }
 
   const updateModalContent = postId => {
-    const post = state.posts.find((p) => p.id === postId)
+    const post = state.posts.find(p => p.id === postId)
     if (!post) return
 
     document.getElementById('postModalLabel').textContent = post.title
@@ -286,7 +288,8 @@ const app = () => {
       watchedState.form.feedback = i18n.t('success')
 
       if (watchedState.feeds.length === 1) {
-        startUpdateTimer()}
+        startUpdateTimer()
+      }
     } catch (err) {
       console.error('Error:', err)
       watchedState.form.error = getErrorKey(err)

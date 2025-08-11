@@ -5,7 +5,7 @@ import uniqueId from 'lodash/uniqueId'
 import onChange from 'on-change'
 import { i18n } from './i18n'
 import { rssSchema } from './validation'
-import bootstrap from 'bootstrap'
+import * as bootstrap from 'bootstrap'
 
 const parseRSS = (xmlString) => {
   const parser = new DOMParser()

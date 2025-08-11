@@ -149,8 +149,7 @@ const checkForUpdates = (state) => {
       if (uniqueNewPosts.length > 0) {
         state.posts.unshift(...uniqueNewPosts)
       }
-    } catch (err)
-    {
+    } catch (err) {
       console.error(`Error updating feed ${feed.url}:`, err)
     }
   })
@@ -188,7 +187,7 @@ const app = () => {
     labelEl: document.querySelector('label[for="url-input"]'),
   }
 
-  const updateModalContent = postId => {
+  const updateModalContent = (postId) => {
     const post = state.posts.find(p => p.id === postId)
     if (!post) return
 
@@ -289,7 +288,8 @@ const app = () => {
       if (watchedState.feeds.length === 1) {
         startUpdateTimer()
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Error:', err)
       watchedState.form.error = getErrorKey(err)
       watchedState.form.process = 'error'

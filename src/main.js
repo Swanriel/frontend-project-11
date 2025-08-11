@@ -149,7 +149,8 @@ const checkForUpdates = (state) => {
       if (uniqueNewPosts.length > 0) {
         state.posts.unshift(...uniqueNewPosts)
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.error(`Error updating feed ${feed.url}:`, err)
     }
   })

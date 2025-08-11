@@ -5,6 +5,7 @@ import uniqueId from 'lodash/uniqueId'
 import onChange from 'on-change'
 import { i18n } from './i18n'
 import { rssSchema } from './validation'
+import bootstrap from 'bootstrap'
 
 const parseRSS = (xmlString) => {
   const parser = new DOMParser()
@@ -29,7 +30,7 @@ const parseRSS = (xmlString) => {
         linkElement?.getAttribute('href') || linkElement?.textContent || '#',
       description:
         item.querySelector('description, content')?.textContent || '',
-    };
+    }
   })
 
   return {
@@ -46,7 +47,7 @@ const renderFeeds = (feeds, container) => {
         ? `<p class="text-muted">${i18n.t('feeds.empty')}</p>`
         : feeds
             .map(
-              (feed) => `
+              feed => `
         <div class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">${feed.title}</h5>
@@ -94,14 +95,14 @@ const renderPosts = (posts, viewedPostIds, container) => {
                 ${i18n.t('posts.preview')}
               </button>
             </div>
-          `;
+          `
               })
               .join('')
       }
     </div>
-  `;
+  `
   container.appendChild(postsContainer)
-};
+}
 
 const initModal = () => {
   if (!document.getElementById('postModal')) {
@@ -123,7 +124,7 @@ const initModal = () => {
           </div>
         </div>
       </div>
-    `;
+    `
     document.body.insertAdjacentHTML('beforeend', modalHTML)
   }
   return new bootstrap.Modal(document.getElementById('postModal'))
@@ -141,22 +142,21 @@ const checkForUpdates = (state) => {
       if (!response.data?.contents) return
 
       const { posts: newPosts } = parseRSS(response.data.contents)
-      const existingPostLinks = new Set(state.posts.map((post) => post.link))
+      const existingPostLinks = new Set(state.posts.map(post => post.link))
       const uniqueNewPosts = newPosts.filter(
-        (post) => !existingPostLinks.has(post.link),
+        post => !existingPostLinks.has(post.link),
       )
 
       if (uniqueNewPosts.length > 0) {
-        state.posts.unshift(...uniqueNewPosts)
-      }
+        state.posts.unshift(...uniqueNewPosts)}
     } catch (err) {
       console.error(`Error updating feed ${feed.url}:`, err)
     }
-  });
-};
+  })
+}
 
 const app = () => {
-  const modal = initModal()
+  initModal();
   const modalElement = document.getElementById('postModal')
 
   const state = {
@@ -187,7 +187,7 @@ const app = () => {
     labelEl: document.querySelector('label[for="url-input"]'),
   }
 
-  const updateModalContent = (postId) => {
+  const updateModalContent = postId => {
     const post = state.posts.find((p) => p.id === postId)
     if (!post) return
 
@@ -222,7 +222,7 @@ const app = () => {
           elements.submitText.textContent = i18n.t('form.loading')
           elements.submitSpinner.classList.remove('d-none')
           elements.validFeedbackEl.style.display = 'none'
-          break;
+          break
         case 'success':
           elements.formEl.reset()
           elements.inputEl.focus()
@@ -235,7 +235,7 @@ const app = () => {
           elements.invalidFeedbackEl.style.display = 'none'
           break
         case 'error':
-          elements.submitBtn.disabled = false;
+          elements.submitBtn.disabled = false
           elements.submitText.textContent = i18n.t('form.submit')
           elements.submitSpinner.classList.add('d-none')
           elements.validFeedbackEl.style.display = 'none'
@@ -259,15 +259,15 @@ const app = () => {
       checkForUpdates(watchedState)
       startUpdateTimer()
     }, 5000)
-  };
+  }
 
   elements.formEl.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     const formData = new FormData(e.target)
     const url = formData.get('url').trim()
 
     try {
-      await rssSchema(state.feeds.map((f) => f.url)).validate({ url })
+      await rssSchema(state.feeds.map(f => f.url)).validate({ url })
       watchedState.form.process = 'sending'
       watchedState.form.error = null
 
@@ -286,8 +286,7 @@ const app = () => {
       watchedState.form.feedback = i18n.t('success')
 
       if (watchedState.feeds.length === 1) {
-        startUpdateTimer()
-      }
+        startUpdateTimer()}
     } catch (err) {
       console.error('Error:', err)
       watchedState.form.error = getErrorKey(err)
@@ -314,7 +313,7 @@ const app = () => {
   elements.feedsContainer.addEventListener('click', (e) => {
     const postLink = e.target.closest('a')
     if (postLink) {
-      const { id } = postLink.dataset;
+      const { id } = postLink.dataset
       watchedState.ui.viewedPostIds.add(id)
     }
 

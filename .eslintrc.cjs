@@ -80,4 +80,4 @@ module.exports = {
       version: 'detect',
     },
   },
-};
+}

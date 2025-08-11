@@ -9,7 +9,7 @@ const TODO_ITEMS = [
   'buy some cheese',
   'feed the cat',
   'book a doctors appointment',
-];
+]
 
 test.describe('New Todo', () => {
   test('should allow me to add todo items', async ({ page }) => {
@@ -31,10 +31,10 @@ test.describe('New Todo', () => {
     await expect(page.getByTestId('todo-title')).toHaveText([
       TODO_ITEMS[0],
       TODO_ITEMS[1],
-    ]);
+    ])
 
     await checkNumberOfTodosInLocalStorage(page, 2)
-  });
+  })
 
   test('should clear text input field when an item is added', async ({
     page,
@@ -89,7 +89,7 @@ test.describe('Mark all as completed', () => {
       'completed',
       'completed',
       'completed',
-    ]);
+    ])
     await checkNumberOfCompletedTodosInLocalStorage(page, 3)
   })
 
@@ -190,7 +190,7 @@ test.describe('Item', () => {
     )
     await secondTodo
       .getByRole('textbox', { name: 'Edit' })
-      .fill('buy some sausages');
+      .fill('buy some sausages')
     await secondTodo.getByRole('textbox', { name: 'Edit' }).press('Enter')
 
     // Explicitly assert the new text value.
@@ -257,9 +257,9 @@ test.describe('Editing', () => {
       TODO_ITEMS[0],
       'buy some sausages',
       TODO_ITEMS[2],
-    ]);
+    ])
     await checkTodosInLocalStorage(page, 'buy some sausages')
-  });
+  })
 
   test('should remove the item if an empty text string was entered', async ({
     page,
@@ -385,7 +385,7 @@ test.describe('Routing', () => {
     await page.getByRole('link', { name: 'Active' }).click()
     await expect(todoItem).toHaveCount(2)
     await expect(todoItem).toHaveText([TODO_ITEMS[0], TODO_ITEMS[2]])
-  });
+  })
 
   test('should respect the back button', async ({ page }) => {
     const todoItem = page.getByTestId('todo-item')
@@ -432,7 +432,7 @@ test.describe('Routing', () => {
   test('should highlight the currently applied filter', async ({ page }) => {
     await expect(page.getByRole('link', { name: 'All' })).toHaveClass(
       'selected',
-    );
+    )
 
     // create locators for active and completed links
     const activeLink = page.getByRole('link', { name: 'Active' })
@@ -441,7 +441,7 @@ test.describe('Routing', () => {
 
     // Page change - active items.
     await expect(activeLink).toHaveClass('selected')
-    await completedLink.click();
+    await completedLink.click()
 
     // Page change - completed items.
     await expect(completedLink).toHaveClass('selected')
@@ -475,9 +475,9 @@ async function checkNumberOfTodosInLocalStorage(page, expected) {
 async function checkNumberOfCompletedTodosInLocalStorage(page, expected) {
   return await page.waitForFunction((e) => {
     return (
-      JSON.parse(localStorage['react-todos']).filter((i) => i.completed)
+      JSON.parse(localStorage['react-todos']).filter(i => i.completed)
         .length === e
-    );
+    )
   }, expected)
 }
 
@@ -488,7 +488,7 @@ async function checkNumberOfCompletedTodosInLocalStorage(page, expected) {
 async function checkTodosInLocalStorage(page, title) {
   return await page.waitForFunction((t) => {
     return JSON.parse(localStorage['react-todos'])
-      .map((i) => i.title)
+      .map(i => i.title)
       .includes(t)
   }, title)
 }

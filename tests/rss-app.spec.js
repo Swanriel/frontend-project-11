@@ -4,7 +4,7 @@ test.describe('RSS Агрегатор', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(
       'https://frontend-project-11-97taoknlf-olesias-projects-3a68a2a5.vercel.app/',
-    );
+    )
     await page.waitForSelector('h1')
   })
 
@@ -20,7 +20,7 @@ test.describe('RSS Агрегатор', () => {
   test('Должен показывать ошибку при невалидном URL', async ({ page }) => {
     await page
       .getByPlaceholder('https://example.com/rss.xml')
-      .fill('не-ссылка');
+      .fill('не-ссылка')
     await page.getByRole('button', { name: 'Добавить' }).click()
     await expect(
       page.getByText(/Ссылка должна быть валидным URL|Invalid URL/),
@@ -49,7 +49,7 @@ test.describe('RSS Агрегатор', () => {
 
     await page
       .getByPlaceholder('https://example.com/rss.xml')
-      .fill('https://example.com/valid.rss');
+      .fill('https://example.com/valid.rss')
     await page.getByRole('button', { name: 'Добавить' }).click()
     await expect(
       page.getByText(/RSS успешно загружен|RSS successfully loaded/),

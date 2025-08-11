@@ -1,5 +1,4 @@
-import { defineConfig } from 'vite';
-import path from 'path';
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   server: {
@@ -7,4 +6,5 @@ export default defineConfig({
       strict: false, // Отключает все ограничения
     },
   },
-});
+})
+
